@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Canvas function spinner items. -->
+    <string-array name="canvas_function">
+        <item>@string/select_function</item>
+        <item>@string/draw_text</item>
+        <item>@string/draw_point</item>
+        <item>@string/draw_two_point</item>
+        <item>@string/draw_line</item>
+        <item>@string/draw_two_line</item>
+        <item>@string/draw_circle</item>
+        <item>@string/draw_rectangle</item>
+        <item>@string/draw_round_rectangle</item>
+        <item>@string/draw_arc</item>
+        <item>@string/draw_oval</item>
+        <item>@string/draw_path</item>
+        <item>@string/draw_circle_path_text</item>
+    </string-array>
+
+</resources>

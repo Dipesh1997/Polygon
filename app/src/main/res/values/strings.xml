@@ -1,0 +1,33 @@
+<resources>
+
+    <string name="app_name">CanvasPaint</string>
+
+    <string name="select_function">Select Function</string>
+
+    <!-- Canvas drawing function example string.-->
+
+    <string name="draw_text">Draw Text</string>
+
+    <string name="draw_point">Draw Point</string>
+
+    <string name="draw_two_point">Draw Two Point</string>
+
+    <string name="draw_line">Draw Line</string>
+
+    <string name="draw_two_line">Draw Two Line</string>
+
+    <string name="draw_circle">Draw Circle</string>
+
+    <string name="draw_rectangle">Draw Rectangle</string>
+
+    <string name="draw_round_rectangle">Draw Round Rectangle</string>
+
+    <string name="draw_arc">Draw Arc</string>
+
+    <string name="draw_oval">Draw Oval</string>
+
+    <string name="draw_path">Draw Path</string>
+
+    <string name="draw_circle_path_text">Draw Circle Path Text</string>
+
+</resources>
