@@ -60,6 +60,9 @@ public class MiniPaintView extends SurfaceView implements SurfaceHolder.Callback
 
 	private int savefirstX;
 	private int savefirstY;
+
+	private int savelastX;
+	private int savelastY;
 	
 	public static final int AIRBRUSH_WIDTH = 30;//set the width (diameter) of the airbrush, when the width is 30, the radius is 15
 	
@@ -132,18 +135,7 @@ public class MiniPaintView extends SurfaceView implements SurfaceHolder.Callback
 			break;
 
 		case POLYGON_MODE:
-				if(_startX < 0) { //see if we have a "first click" set of coords
-					_startX = x;
-					_startY = y;
-					savefirstX = x;
-					savefirstY = y;
-				}
-				else {
-					drawLine(_startX, _startY, x, y);
-					_startX = x;//update the start coordinate to be the last used point on the screen rather than resetting it to a pre-defined number, this is what allows for multiple lines
-					_startY = y;
-					drawLine(x ,y ,savefirstX ,savefirstY);
-				}
+				drawLine(x,y,30,50);
 
 				break;
 		}
@@ -342,6 +334,181 @@ public class MiniPaintView extends SurfaceView implements SurfaceHolder.Callback
 			}
 		}
 		
+	}
+	public void deleteLastLine(int startX, int startY, int endX, int endY)
+	{
+		//ALGORITHM: Bresenham's algorithm for drawing lines is based on finding the pixels that are as close as possible to the theoretical perfect line
+		//we choose to go up or down (or left or right depending on direction) based on the previous decision. We can almost think of this like a cascade of error piling up over time.
+		//the pixel to choose is based on a mathematical derivation based on choosing which pixel is closer to the theoretical line.
+		//From there, we can use mathematical induction to find an equation for each current decision based on the previous decision.
+
+		/////////////////
+		//SETUP
+		/////////////////
+
+		//make local variables for the left and right end points
+		int x0;//the left
+		int y0;
+		int x1;//the right
+		int y1;
+
+		//check to see which point is the left point, then store them appropriately
+		if(startX<endX)//if the startX is on the left, store that point as (x0 , y0)
+		{
+			x0 = startX;
+			y0 = startY;
+			x1 = endX;
+			y1 = endY;
+		}
+		else
+		{
+			x0 = endX;
+			y0 = endY;
+			x1 = startX;
+			y1 = startY;
+		}
+		_bmp.setPixel(x0, y0, Color.BLACK);//set the first pixel to be the color
+
+
+		//we need to figure out if y is decreasing to handle half of the cases
+		boolean yDecreasing;
+
+		if(y1<y0)
+		{
+			yDecreasing = true;
+		}
+		else
+		{
+			yDecreasing = false;
+		}
+
+//		Calculate constants dx, dy, 2dy (called dy2 for variable name) and 2dy - 2dx(called dy2_2dx)
+		int dx = x1-x0;
+		int dx2 = 2*dx;//store this to decrease math done per pixel
+
+		int dy;//determine dy based on whether or not the line has negative slope
+		if(!yDecreasing)
+			dy = y1-y0;
+		else
+			dy = y0-y1;
+
+		int dy2= (2*dy);
+		int dy2_2dx = dy2-(2*dx);
+		int dx2_2dy = dx2-dy2;
+
+		int previousY=y0;
+		int currentY=y0;
+
+		int previousX=x0;
+		int currentX=x0;
+
+//		Calculate starting value of decision parameter
+		//pK is a decision parameter used to help make the next decision pKplusOne
+		int p0 = dy2-dx;//the initial decision which is not actually a decision because we want to color the start pixel for sure
+		int previousPK=p0;
+		int pKplusOne;//the next decision
+
+
+		//k is just a counter to tell us how many decisions we've made or how many pixels we've colored
+
+		/////////////////
+		//THE ACTUAL LINE MAKING AND DRAWING
+		/////////////////
+
+
+		if(yDecreasing==false)//if the line's y values are "increasing" on the screen, actually decreasing
+		{
+			//depending on if dy>dx, make separate cases and change iteration variable to dy or dx
+			if(dy>dx)//for the steep case
+			{
+				for(int k=1; k<dy; k++)
+				{
+					_bmp.setPixel(currentX, y0+k, Color.BLACK);
+					//based on our previous decision, make a new decision and increment x as necessary
+					if(previousPK<0)
+					{
+						pKplusOne=previousPK + dx2;//the equations from lecture
+						currentX= previousX;
+					}
+					else
+					{
+						pKplusOne=previousPK + dx2_2dy;//the equations from lecture
+						currentX= previousX + 1;
+					}
+					previousX = currentX;//set the previous to be the current so we can use the current as the previous for the next time
+					_bmp.setPixel(currentX, y0+k, Color.BLACK);
+					previousPK = pKplusOne;
+				}
+			}
+			else//for the not-steep case
+			{
+				for(int k=1; k<dx; k++)//going along each x from left to right
+				{
+					_bmp.setPixel(x0+k, currentY, Color.BLACK);
+					//based on our previous decision, make a new decision and increment y as necessary
+					if(previousPK<0)
+					{
+						pKplusOne=previousPK + dy2;//the equations from lecture
+						currentY= previousY;
+					}
+					else
+					{
+						pKplusOne=previousPK + dy2_2dx;//the equations from lecture
+						currentY= previousY + 1;
+					}
+					previousY = currentY;//set the previous to be the current so we can use the current as the previous for the next time
+					_bmp.setPixel(x0+k, currentY, Color.BLACK);
+					previousPK = pKplusOne;
+				}
+			}
+		}
+		else//y is decreasing
+		{
+			//depending on if dy>dx, make separate cases and change iteration variable to dy or dx
+			if(dy>dx)//the steep case
+			{
+				for(int k=1; k<dy; k++)
+				{
+					_bmp.setPixel(currentX, y0-k, Color.BLACK);//set the current pixel
+					//based on our previous decision, make a new decision and increment x as necessary
+					if(previousPK<0)
+					{
+						pKplusOne=previousPK + dx2;
+						currentX= previousX;
+					}
+					else
+					{
+						pKplusOne=previousPK + dx2_2dy;
+						currentX= previousX + 1;
+					}
+					previousX = currentX;//set the previous to be the current so we can use the current as the previous for the next time
+					_bmp.setPixel(currentX, y0-k, Color.BLACK);
+					previousPK = pKplusOne;
+				}
+			}
+			else//the not steep case
+			{
+				for(int k=1; k<dx; k++)//going along each x from left to right
+				{
+					_bmp.setPixel(x0+k, currentY, Color.BLACK);
+					//based on our previous decision, make a new decision and increment y as necessary
+					if(previousPK<0)
+					{
+						pKplusOne=previousPK + dy2;
+						currentY= previousY;
+					}
+					else
+					{
+						pKplusOne=previousPK + dy2_2dx;
+						currentY= previousY - 1;
+					}
+					previousY = currentY;//set the previous to be the current so we can use the current as the previous for the next time
+					_bmp.setPixel(x0+k, currentY, Color.BLACK);
+					previousPK = pKplusOne;
+				}
+			}
+		}
+
 	}
 
 	/**
