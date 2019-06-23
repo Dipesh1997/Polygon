@@ -30,4 +30,23 @@
 
     <string name="draw_circle_path_text">Draw Circle Path Text</string>
 
+    <string-array name="draw_mode_array">
+        <item>Point Mode</item>
+        <item>Line Mode</item>
+        <item>Circle Mode</item>
+        <item>Polyline Mode</item>
+        <item>Rectangle Mode</item>
+        <item>Flood Fill Mode</item>
+        <item>Airbrush Mode</item>
+        <item>Polygon</item>
+    </string-array>
+
+    <string-array name="minipaint_array">
+        <item>@raw/test1</item>
+        <item>@raw/hi</item>
+        <item>@raw/flower</item>
+        <item>@raw/house</item>
+    </string-array>
+
+
 </resources>
